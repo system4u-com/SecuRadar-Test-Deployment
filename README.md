@@ -1,6 +1,6 @@
 # SecuRadar Azure Deployment
 
-Version: v0.9.2
+Version: v0.9.3
 
 Choose the deployment scope that matches the customer subscription:
 
@@ -14,13 +14,13 @@ In Azure Portal, go to Subscriptions → select the target subscription → Reso
 
 Creates the SecuRadar resource group, workspace, Sentinel configuration, and Lighthouse delegation at subscription scope. Choose the deployment region in the Azure portal.
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsystem4u-com%2FSecuRadar-Test-Deployment%2Fv0.9.2%2Fazuredeploy.subscription.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsystem4u-com%2FSecuRadar-Test-Deployment%2Fv0.9.3%2Fazuredeploy.subscription.json)
 
 ## Use an existing resource group
 
 Deploys the workspace and Sentinel configuration into an existing resource group. The resource group's location is used. Lighthouse assignment is scoped to that resource group.
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsystem4u-com%2FSecuRadar-Test-Deployment%2Fv0.9.2%2Fazuredeploy.resourceGroup.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsystem4u-com%2FSecuRadar-Test-Deployment%2Fv0.9.3%2Fazuredeploy.resourceGroup.json)
 
 ## Parameters
 

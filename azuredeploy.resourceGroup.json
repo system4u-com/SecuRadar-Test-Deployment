@@ -1,0 +1,1261 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.48.1.52935",
+      "templateHash": "7596369462209631912"
+    }
+  },
+  "parameters": {
+    "customerShortcut": {
+      "type": "string",
+      "metadata": {
+        "displayName": "Customer Shortcut",
+        "description": "Customer identifier used in the workspace name. It is converted to lowercase."
+      },
+      "minLength": 1,
+      "maxLength": 44
+    },
+    "releaseChannel": {
+      "type": "string",
+      "defaultValue": "prod",
+      "allowedValues": [
+        "prod",
+        "test"
+      ],
+      "metadata": {
+        "displayName": "Release Channel",
+        "description": "Release channel controls workspace naming and provider authorization identities. Always use prod except for development purposes."
+      }
+    },
+    "deploymentType": {
+      "type": "string",
+      "allowedValues": [
+        "securityAssessment",
+        "fullDeployment"
+      ],
+      "metadata": {
+        "displayName": "Deployment Type"
+      }
+    },
+    "socActive": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "displayName": "SoC Active",
+        "description": "Is the SoC service bought with the product"
+      }
+    },
+    "skipEntityAnalytics": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "displayName": "Redeploy",
+        "description": "Set true when redeploying to prevent UEBA enablement error"
+      }
+    },
+    "l3Only": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "displayName": "L3 Only",
+        "description": "Select if only L3 authorizations should be applied."
+      }
+    }
+  },
+  "variables": {
+    "$fxv#0": {
+      "retentionInDays": 90,
+      "sku": {
+        "name": "PerGB2018"
+      },
+      "workspaceCapping": {
+        "dailyQuotaGb": 10
+      }
+    },
+    "$fxv#1": {
+      "l3Authorizations": [
+        {
+          "principalId": "8806dc7a-5cc1-46f2-a8f6-02c8f7bda846",
+          "principalIdDisplayName": "System4u SecuRadar L3",
+          "roleDefinitionId": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+        },
+        {
+          "principalId": "8806dc7a-5cc1-46f2-a8f6-02c8f7bda846",
+          "principalIdDisplayName": "System4u SecuRadar L3",
+          "roleDefinitionId": "ab8e14d6-4a74-4a29-9ba8-549422addade"
+        },
+        {
+          "principalId": "8806dc7a-5cc1-46f2-a8f6-02c8f7bda846",
+          "principalIdDisplayName": "System4u SecuRadar L3",
+          "roleDefinitionId": "91c1777a-f3dc-4fae-b103-61d183457e46"
+        }
+      ],
+      "assessmentAuthorizations": [
+        {
+          "principalId": "ddf45ba0-3a85-486d-8312-85b5746fc10e",
+          "principalIdDisplayName": "System4u SecuRadar Service",
+          "roleDefinitionId": "3e150937-b8fe-4cfb-8069-0eaf05ecd056"
+        },
+        {
+          "principalId": "d78941e7-e9b5-44cb-b9a0-49120dad7b07",
+          "principalIdDisplayName": "System4u SecuRadar Reader Service",
+          "roleDefinitionId": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+        },
+        {
+          "principalId": "dc0d5e84-f10f-498f-8c1d-496ab2112973",
+          "principalIdDisplayName": "System4u SecuRadar L2",
+          "roleDefinitionId": "8d289c81-5878-46d4-8554-54e1e3d8b5cb"
+        }
+      ],
+      "fullAuthorizations": {
+        "prod": [
+          {
+            "principalId": "ddf45ba0-3a85-486d-8312-85b5746fc10e",
+            "principalIdDisplayName": "System4u SecuRadar Service",
+            "roleDefinitionId": "3e150937-b8fe-4cfb-8069-0eaf05ecd056"
+          },
+          {
+            "principalId": "d78941e7-e9b5-44cb-b9a0-49120dad7b07",
+            "principalIdDisplayName": "System4u SecuRadar Reader Service",
+            "roleDefinitionId": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+          },
+          {
+            "principalId": "dc0d5e84-f10f-498f-8c1d-496ab2112973",
+            "principalIdDisplayName": "System4u SecuRadar L2",
+            "roleDefinitionId": "8d289c81-5878-46d4-8554-54e1e3d8b5cb"
+          }
+        ],
+        "test": [
+          {
+            "principalId": "a01d0011-9ba1-4b93-a1a5-9e02ba45e3c2",
+            "principalIdDisplayName": "System4u SecuRadar Test Service",
+            "roleDefinitionId": "3e150937-b8fe-4cfb-8069-0eaf05ecd056"
+          },
+          {
+            "principalId": "fb709aea-0bf2-42dc-9f05-9b30a6a2e8ff",
+            "principalIdDisplayName": "System4u SecuRadar Test Reader Service",
+            "roleDefinitionId": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+          },
+          {
+            "principalId": "cfa55146-b6bd-4dc8-8a7d-7f8cdb59bad3",
+            "principalIdDisplayName": "System4u SecuRadar Test L2",
+            "roleDefinitionId": "8d289c81-5878-46d4-8554-54e1e3d8b5cb"
+          }
+        ]
+      },
+      "socAuthorizations": {
+        "prod": [
+          {
+            "principalId": "dc0d5e84-f10f-498f-8c1d-496ab2112973",
+            "principalIdDisplayName": "System4u SecuRadar L2",
+            "roleDefinitionId": "3e150937-b8fe-4cfb-8069-0eaf05ecd056"
+          },
+          {
+            "principalId": "dc0d5e84-f10f-498f-8c1d-496ab2112973",
+            "principalIdDisplayName": "System4u SecuRadar L2",
+            "roleDefinitionId": "51d6186e-6489-4900-b93f-92e23144cca5"
+          }
+        ],
+        "test": [
+          {
+            "principalId": "cfa55146-b6bd-4dc8-8a7d-7f8cdb59bad3",
+            "principalIdDisplayName": "System4u SecuRadar Test L2",
+            "roleDefinitionId": "3e150937-b8fe-4cfb-8069-0eaf05ecd056"
+          },
+          {
+            "principalId": "cfa55146-b6bd-4dc8-8a7d-7f8cdb59bad3",
+            "principalIdDisplayName": "System4u SecuRadar Test L2",
+            "roleDefinitionId": "51d6186e-6489-4900-b93f-92e23144cca5"
+          }
+        ]
+      },
+      "eligibleAuthorizations": [
+        {
+          "justInTimeAccessPolicy": {
+            "multiFactorAuthProvider": "Azure",
+            "maximumActivationDuration": "PT4H"
+          },
+          "principalId": "8806dc7a-5cc1-46f2-a8f6-02c8f7bda846",
+          "principalIdDisplayName": "System4u SecuRadar L3",
+          "roleDefinitionId": "b24988ac-6180-42a0-ab88-20f7382dd24c"
+        },
+        {
+          "justInTimeAccessPolicy": {
+            "multiFactorAuthProvider": "Azure",
+            "maximumActivationDuration": "PT4H"
+          },
+          "principalId": "8806dc7a-5cc1-46f2-a8f6-02c8f7bda846",
+          "principalIdDisplayName": "System4u SecuRadar L3",
+          "roleDefinitionId": "39bc4728-0917-49c7-9d2c-d95423bc2eb4"
+        }
+      ],
+      "testAuthorizations": [
+        {
+          "principalId": "4eec8a82-9c3e-49ab-8c2f-5d6f7b49e22f",
+          "principalIdDisplayName": "System4u SecuRadar MS",
+          "roleDefinitionId": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+        },
+        {
+          "principalId": "4eec8a82-9c3e-49ab-8c2f-5d6f7b49e22f",
+          "principalIdDisplayName": "System4u SecuRadar MS",
+          "roleDefinitionId": "ab8e14d6-4a74-4a29-9ba8-549422addade"
+        },
+        {
+          "principalId": "4eec8a82-9c3e-49ab-8c2f-5d6f7b49e22f",
+          "principalIdDisplayName": "System4u SecuRadar MS",
+          "roleDefinitionId": "91c1777a-f3dc-4fae-b103-61d183457e46"
+        }
+      ]
+    },
+    "$fxv#2": {
+      "watchlists": [
+        {
+          "alias": "SecuRadar_WL_Params_Cost_Calculator",
+          "displayName": "SecuRadar_WL_Params_Cost_Calculator",
+          "description": "This watchlist contains the parameters for cost calculator for SecuRadar",
+          "itemsSearchKey": "Key",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "Key": "sentinelIngestionCurrency",
+              "Value": "EUR"
+            },
+            {
+              "Key": "sentinelIngestionPriceGB",
+              "Value": "4.83"
+            },
+            {
+              "Key": "sentinelIngestionSeatsE5",
+              "Value": "0"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_WL_Accounts_EntraID_Break-Glass",
+          "displayName": "SecuRadar_WL_Accounts_EntraID_Break-Glass",
+          "description": "This watchlist contains the EntraID Break-Glass Accounts for SecuRadar",
+          "itemsSearchKey": "UserId",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "UserId": "_DUMMY_",
+              "UserPrincipalName": "Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_WL_Groups_EntraID_Privileged",
+          "displayName": "SecuRadar_WL_Groups_EntraID_Privileged",
+          "description": "This watchlist contains the PrivilegedGroups for SecuRadar",
+          "itemsSearchKey": "GroupId",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "GroupId": "_DUMMY_",
+              "Name": "Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_WL_Limits_EXO_Sender_Hourly_Outgoing",
+          "displayName": "SecuRadar_WL_Limits_EXO_Sender_Hourly_Outgoing",
+          "description": "This watchlist contains the Hourly Limit for outgoing emails sent by individual sender",
+          "itemsSearchKey": "Sender",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "Sender": "_DEFAULT_",
+              "Limit": "20"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_WL_Limits_EXO_Sender_Hourly_Incoming",
+          "displayName": "SecuRadar_WL_Limits_EXO_Sender_Hourly_Incoming",
+          "description": "This watchlist contains the Hourly Limit for incoming emails received from individual sender",
+          "itemsSearchKey": "Sender",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "Sender": "_DEFAULT_",
+              "Limit": "20"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_WL_Limits_SPO_User_Hourly_Download",
+          "displayName": "SecuRadar_WL_Limits_SPO_User_Hourly_Download",
+          "description": "This watchlist contains the Hourly Limit for Download operations by individual user",
+          "itemsSearchKey": "UserId",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "UserId": "_DEFAULT_",
+              "Limit": "10"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_WL_Limits_SPO_User_Hourly_Modify",
+          "displayName": "SecuRadar_WL_Limits_SPO_User_Hourly_Modify",
+          "description": "This watchlist contains the Hourly Limit for Modify operations by individual user",
+          "itemsSearchKey": "UserId",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "UserId": "_DEFAULT_",
+              "Limit": "10"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_WL_Limits_SPO_User_Hourly_Delete",
+          "displayName": "SecuRadar_WL_Limits_SPO_User_Hourly_Delete",
+          "description": "This watchlist contains the Hourly Limit for Delete operations by individual user",
+          "itemsSearchKey": "UserId",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "UserId": "_DEFAULT_",
+              "Limit": "10"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_WL_Limits_SPO_User_Hourly_External_Share",
+          "displayName": "SecuRadar_WL_Limits_SPO_User_Hourly_External_Share",
+          "description": "This watchlist contains the Hourly Limit for External Share operations by individual user",
+          "itemsSearchKey": "UserId",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "UserId": "_DEFAULT_",
+              "Limit": "10"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_WL_Exceptions_AD_Actors",
+          "displayName": "SecuRadar_WL_Exceptions_AD_Actors",
+          "description": "This watchlist contains the excluded actors for various Active Directory detections",
+          "itemsSearchKey": "UserSid",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "UserSid": "_DUMMY_",
+              "UserName": "Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_WL_Exceptions_Conditional_Access_Apps",
+          "displayName": "SecuRadar_WL_Exceptions_Conditional_Access_Apps",
+          "description": "This watchlist contains the exceptions for Conditional Access policies for application",
+          "itemsSearchKey": "AppId",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "AppId": "_DUMMY_",
+              "Name": "Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_WL_Exceptions_Conditional_Access_Users",
+          "displayName": "SecuRadar_WL_Exceptions_Conditional_Access_Users",
+          "description": "This watchlist contains the exceptions for Conditional Access policies for users",
+          "itemsSearchKey": "UserId",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "UserId": "_DUMMY_",
+              "UserPrincipalName": "Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_WL_Exceptions_MFA_Apps",
+          "displayName": "SecuRadar_WL_Exceptions_MFA_Apps",
+          "description": "This watchlist contains the exceptions for MFA policies for application",
+          "itemsSearchKey": "AppId",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "AppId": "_DUMMY_",
+              "Name": "Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_WL_Exceptions_MFA_Users",
+          "displayName": "SecuRadar_WL_Exceptions_MFA_Users",
+          "description": "This watchlist contains the exceptions for MFA policies for users",
+          "itemsSearchKey": "UserId",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "UserId": "_DUMMY_",
+              "UserPrincipalName": "Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_WL_Exceptions_Managed_Device_Apps",
+          "displayName": "SecuRadar_WL_Exceptions_Managed_Device_Apps",
+          "description": "This watchlist contains the exceptions for Managed Device policies for application",
+          "itemsSearchKey": "AppId",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "AppId": "_DUMMY_",
+              "Name": "Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_WL_Exceptions_Managed_Device_Users",
+          "displayName": "SecuRadar_WL_Exceptions_Managed_Device_Users",
+          "description": "This watchlist contains the exceptions for Managed Device policies for users",
+          "itemsSearchKey": "UserId",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "UserId": "_DUMMY_",
+              "UserPrincipalName": "Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_WL_Limits_OD_User_Hourly_Modify",
+          "displayName": "SecuRadar_WL_Limits_OD_User_Hourly_Modify",
+          "description": "This watchlist contains the Hourly Limit for Modify operations by individual user in OneDrive",
+          "itemsSearchKey": "UserId",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "UserId": "_DEFAULT_",
+              "Limit": "100"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_WL_Exceptions_Microsoft_1st_Party_Apps",
+          "displayName": "SecuRadar_WL_Exceptions_Microsoft_1st_Party_Apps",
+          "description": "This watchlist contains the Microsoft 1st party known Apps which are excluded from various detections in SecuRadar",
+          "itemsSearchKey": "AppId",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "AppId": "_DUMMY_",
+              "Name": "Do not detele or modify!",
+              "Description": "Please do not delete or modify this entry!"
+            },
+            {
+              "AppId": "944f0bd1-117b-4b1c-af26-804ed95e767e",
+              "Name": "Media Analysis and Transformation Service",
+              "Description": "is a Microsoft 1st party service and its main purpose is to transform and analyze various media artifacts/files in One-drive and SharePoint. Media Analysis and Transformation Service may access a file if a user engages with some product experience that makes a call to the service requesting a file transform on demand. Thumbnail generation is one such process, as in the tile view in a document. Video playback is another on-demand process it supports."
+            },
+            {
+              "AppId": "4747d38e-36c5-4bc3-979b-b0ef74df54d1",
+              "Name": "PushChannel",
+              "Description": "Internal Microsoft service principal associated with the PushChannel subsystem. It commonly appears during: File syncing, Metadata updates, Version propagation, Background processing of Edge Workspace files"
+            },
+            {
+              "AppId": "5e2795e3-ce8c-4cfb-b302-35fe5cd01597",
+              "Name": "Designer",
+              "Description": "Service principal for Microsoft Designer - part of Microsoft 365 Copilot experience. It is used for generating images, videos, and other content based on user prompts."
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_Suite",
+          "displayName": "SecuRadar_Suite",
+          "description": "This watchlist contains the default values for SecuRadar",
+          "itemsSearchKey": "Name",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "Name": "SecuRadar - Do not detele or modify!",
+              "Value": "SecuRadar - Do not detele or modify!"
+            },
+            {
+              "Name": "sentinelIngestionCurrency",
+              "Value": "EUR"
+            },
+            {
+              "Name": "sentinelIngestionPriceGB",
+              "Value": "4.83"
+            },
+            {
+              "Name": "sentinelIngestionSeatsE5",
+              "Value": "0"
+            },
+            {
+              "Name": "mailSenderOutboundLimit",
+              "Value": "100"
+            },
+            {
+              "Name": "mailSubjectInboundLimit",
+              "Value": "100"
+            },
+            {
+              "Name": "mailSenderInboundLimit",
+              "Value": "100"
+            },
+            {
+              "Name": "fileDownloadLimit",
+              "Value": "50"
+            },
+            {
+              "Name": "fileDeleteLimit",
+              "Value": "100"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_EntraTenantID",
+          "displayName": "SecuRadar_EntraTenantID",
+          "description": "This watchlist contains the EntraTenantID for SecuRadar",
+          "itemsSearchKey": "EntraTenantID",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "EntraTenantID": "SecuRadar - Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_TrustedIPs",
+          "displayName": "SecuRadar_TrustedIPs",
+          "description": "This watchlist contains the TrustedLocations for SecuRadar",
+          "itemsSearchKey": "IpAddress",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "IpAddress": "SecuRadar - Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_VIPUsers",
+          "displayName": "SecuRadar_VIPUsers",
+          "description": "This watchlist contains the VIP users for SecuRadar",
+          "itemsSearchKey": "UPN",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "UPN": "SecuRadar - Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_BreakglassAccounts",
+          "displayName": "SecuRadar_BreakglassAccounts",
+          "description": "This watchlist contains the BreakGlassAccounts for SecuRadar",
+          "itemsSearchKey": "UPN",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "UPN": "SecuRadar - Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_ServiceAccounts",
+          "displayName": "SecuRadar_ServiceAccounts",
+          "description": "This watchlist contains the ServiceAccounts for SecuRadar",
+          "itemsSearchKey": "UPN",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "UPN": "SecuRadar - Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_PrivilegedGroupNames",
+          "displayName": "SecuRadar_PrivilegedGroupNames",
+          "description": "This watchlist contains the PrivilegedGroups for SecuRadar",
+          "itemsSearchKey": "Name",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "Name": "SecuRadar - Do not detele or modify!",
+              "GroupId": "SecuRadar - Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_AllowedDownloaders",
+          "displayName": "SecuRadar_AllowedDownloaders",
+          "description": "This watchlist contains the AllowedDownloaders for SecuRadar",
+          "itemsSearchKey": "AllowedObjectId",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "AllowedObjectId": "SecuRadar - Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_AllowedSendersOutbound",
+          "displayName": "SecuRadar_AllowedSendersOutbound",
+          "description": "This watchlist contains the AllowedDSendersOutbound for SecuRadar",
+          "itemsSearchKey": "EmailAddress",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "EmailAddress": "SecuRadar - Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_AllowedSendersInbound",
+          "displayName": "SecuRadar_AllowedSendersInbound",
+          "description": "This watchlist contains the AllowedDSendersInbound for SecuRadar",
+          "itemsSearchKey": "EmailAddress",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "EmailAddress": "SecuRadar - Do not detele or modify!"
+            }
+          ]
+        },
+        {
+          "alias": "SecuRadar_AllowedRecipientsOutbound",
+          "displayName": "SecuRadar_AllowedRecipientsOutbound",
+          "description": "This watchlist contains the AllowedRecipientsOutbound for SecuRadar",
+          "itemsSearchKey": "EmailAddress",
+          "categories": [
+            "shared"
+          ],
+          "items": [
+            {
+              "EmailAddress": "SecuRadar - Do not detele or modify!"
+            }
+          ]
+        }
+      ]
+    },
+    "normalizedShortcut": "[toLower(parameters('customerShortcut'))]",
+    "location": "[resourceGroup().location]",
+    "workspaceName": "[format('law-{0}-securadar-{1}', parameters('releaseChannel'), variables('normalizedShortcut'))]",
+    "managedByTenantId": "44f92daa-236e-4e7a-8e2a-33ed2e21809c",
+    "workspaceProperties": "[variables('$fxv#0')]",
+    "lighthouseConfig": "[variables('$fxv#1')]",
+    "channelFullAuthorizations": "[variables('lighthouseConfig').fullAuthorizations[parameters('releaseChannel')]]",
+    "channelSocAuthorizations": "[variables('lighthouseConfig').socAuthorizations[parameters('releaseChannel')]]",
+    "authorizations": "[if(parameters('l3Only'), variables('lighthouseConfig').l3Authorizations, concat(variables('lighthouseConfig').l3Authorizations, if(equals(parameters('deploymentType'), 'securityAssessment'), variables('lighthouseConfig').assessmentAuthorizations, variables('channelFullAuthorizations')), if(parameters('socActive'), variables('channelSocAuthorizations'), createArray())))]",
+    "watchlistConfig": "[variables('$fxv#2')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "securadar-lighthouse",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "managedByTenantId": {
+            "value": "[variables('managedByTenantId')]"
+          },
+          "offerName": {
+            "value": "System4u SecuRadar"
+          },
+          "offerDescription": {
+            "value": "System4u SecuRadar solution"
+          },
+          "authorizations": {
+            "value": "[variables('authorizations')]"
+          },
+          "eligibleAuthorizations": {
+            "value": "[variables('lighthouseConfig').eligibleAuthorizations]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.48.1.52935",
+              "templateHash": "229199746617853008"
+            }
+          },
+          "parameters": {
+            "managedByTenantId": {
+              "type": "string"
+            },
+            "offerName": {
+              "type": "string"
+            },
+            "offerDescription": {
+              "type": "string"
+            },
+            "authorizations": {
+              "type": "array"
+            },
+            "eligibleAuthorizations": {
+              "type": "array"
+            }
+          },
+          "variables": {
+            "registrationId": "[guid(resourceGroup().id, parameters('offerName'))]",
+            "assignmentId": "[guid(parameters('offerName'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.ManagedServices/registrationAssignments",
+              "apiVersion": "2022-10-01",
+              "name": "[variables('assignmentId')]",
+              "properties": {
+                "registrationDefinitionId": "[reference(subscriptionResourceId('Microsoft.Resources/deployments', format('securadar-lighthouse-definition-{0}', uniqueString(resourceGroup().id))), '2025-04-01').outputs.registrationDefinitionId.value]"
+              },
+              "dependsOn": [
+                "[subscriptionResourceId('Microsoft.Resources/deployments', format('securadar-lighthouse-definition-{0}', uniqueString(resourceGroup().id)))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "[format('securadar-lighthouse-definition-{0}', uniqueString(resourceGroup().id))]",
+              "subscriptionId": "[subscription().subscriptionId]",
+              "location": "[resourceGroup().location]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "registrationId": {
+                    "value": "[variables('registrationId')]"
+                  },
+                  "offerName": {
+                    "value": "[parameters('offerName')]"
+                  },
+                  "offerDescription": {
+                    "value": "[parameters('offerDescription')]"
+                  },
+                  "managedByTenantId": {
+                    "value": "[parameters('managedByTenantId')]"
+                  },
+                  "authorizations": {
+                    "value": "[parameters('authorizations')]"
+                  },
+                  "eligibleAuthorizations": {
+                    "value": "[parameters('eligibleAuthorizations')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.48.1.52935",
+                      "templateHash": "2675250593063482630"
+                    }
+                  },
+                  "parameters": {
+                    "registrationId": {
+                      "type": "string"
+                    },
+                    "managedByTenantId": {
+                      "type": "string"
+                    },
+                    "offerName": {
+                      "type": "string"
+                    },
+                    "offerDescription": {
+                      "type": "string"
+                    },
+                    "authorizations": {
+                      "type": "array"
+                    },
+                    "eligibleAuthorizations": {
+                      "type": "array"
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.ManagedServices/registrationDefinitions",
+                      "apiVersion": "2022-10-01",
+                      "name": "[parameters('registrationId')]",
+                      "properties": {
+                        "registrationDefinitionName": "[parameters('offerName')]",
+                        "description": "[parameters('offerDescription')]",
+                        "managedByTenantId": "[parameters('managedByTenantId')]",
+                        "authorizations": "[parameters('authorizations')]",
+                        "eligibleAuthorizations": "[parameters('eligibleAuthorizations')]"
+                      }
+                    }
+                  ],
+                  "outputs": {
+                    "registrationDefinitionId": {
+                      "type": "string",
+                      "value": "[subscriptionResourceId('Microsoft.ManagedServices/registrationDefinitions', parameters('registrationId'))]"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "outputs": {
+            "registrationDefinitionId": {
+              "type": "string",
+              "value": "[reference(subscriptionResourceId('Microsoft.Resources/deployments', format('securadar-lighthouse-definition-{0}', uniqueString(resourceGroup().id))), '2025-04-01').outputs.registrationDefinitionId.value]"
+            },
+            "registrationAssignmentId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.ManagedServices/registrationAssignments', variables('assignmentId'))]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "securadar-customer-infrastructure",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[variables('location')]"
+          },
+          "workspaceName": {
+            "value": "[variables('workspaceName')]"
+          },
+          "workspaceProperties": {
+            "value": "[variables('workspaceProperties')]"
+          },
+          "skipEntityAnalytics": {
+            "value": "[parameters('skipEntityAnalytics')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.48.1.52935",
+              "templateHash": "930615491723868439"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "workspaceName": {
+              "type": "string"
+            },
+            "workspaceProperties": {
+              "type": "object"
+            },
+            "skipEntityAnalytics": {
+              "type": "bool"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.OperationalInsights/workspaces",
+              "apiVersion": "2022-10-01",
+              "name": "[parameters('workspaceName')]",
+              "location": "[parameters('location')]",
+              "properties": "[parameters('workspaceProperties')]"
+            },
+            {
+              "type": "Microsoft.SecurityInsights/onboardingStates",
+              "apiVersion": "2023-02-01",
+              "scope": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]",
+              "name": "default",
+              "properties": {
+                "customerManagedKey": false
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+              ]
+            },
+            {
+              "condition": "[not(parameters('skipEntityAnalytics'))]",
+              "type": "Microsoft.SecurityInsights/settings",
+              "apiVersion": "2024-10-01-preview",
+              "scope": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]",
+              "name": "EntityAnalytics",
+              "kind": "EntityAnalytics",
+              "properties": {
+                "entityProviders": [
+                  "AzureActiveDirectory"
+                ]
+              },
+              "dependsOn": [
+                "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')), 'Microsoft.SecurityInsights/onboardingStates', 'default')]",
+                "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.SecurityInsights/settings",
+              "apiVersion": "2024-10-01-preview",
+              "scope": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]",
+              "name": "Anomalies",
+              "kind": "Anomalies",
+              "properties": {},
+              "dependsOn": [
+                "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')), 'Microsoft.SecurityInsights/onboardingStates', 'default')]",
+                "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "workspaceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "securadar-data-connectors",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "workspaceName": {
+            "value": "[variables('workspaceName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.48.1.52935",
+              "templateHash": "14742406776437408479"
+            }
+          },
+          "parameters": {
+            "workspaceName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the Sentinel-enabled Log Analytics workspace."
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.SecurityInsights/dataConnectors",
+              "apiVersion": "2024-03-01",
+              "scope": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]",
+              "name": "[guid(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')), tenant().tenantId, 'Office365')]",
+              "kind": "Office365",
+              "properties": {
+                "tenantId": "[tenant().tenantId]",
+                "dataTypes": {
+                  "exchange": {
+                    "state": "Enabled"
+                  },
+                  "sharePoint": {
+                    "state": "Enabled"
+                  },
+                  "teams": {
+                    "state": "Enabled"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'securadar-customer-infrastructure')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "securadar-workspace-transformations",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[variables('location')]"
+          },
+          "workspaceName": {
+            "value": "[variables('workspaceName')]"
+          },
+          "workspaceProperties": {
+            "value": "[variables('workspaceProperties')]"
+          },
+          "customerShortcut": {
+            "value": "[variables('normalizedShortcut')]"
+          },
+          "releaseChannel": {
+            "value": "[parameters('releaseChannel')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.48.1.52935",
+              "templateHash": "17590126211086376489"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "workspaceName": {
+              "type": "string"
+            },
+            "workspaceProperties": {
+              "type": "object"
+            },
+            "customerShortcut": {
+              "type": "string"
+            },
+            "releaseChannel": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "destinationName": "sentinelWorkspace",
+            "dcrName": "[format('dcr-{0}-securadar-{1}', parameters('releaseChannel'), toLower(parameters('customerShortcut')))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Insights/dataCollectionRules",
+              "apiVersion": "2024-03-11",
+              "name": "[variables('dcrName')]",
+              "location": "[parameters('location')]",
+              "kind": "WorkspaceTransforms",
+              "properties": {
+                "dataSources": {},
+                "destinations": {
+                  "logAnalytics": [
+                    {
+                      "name": "[variables('destinationName')]",
+                      "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+                    }
+                  ]
+                },
+                "dataFlows": [
+                  {
+                    "streams": [
+                      "Microsoft-Table-DeviceProcessEvents"
+                    ],
+                    "destinations": [
+                      "[variables('destinationName')]"
+                    ],
+                    "transformKql": "source | where FolderPath !startswith \"C:\\\\Windows\\\\\" and FolderPath !startswith \"C:\\\\Program Files\\\\\" and FolderPath !startswith \"C:\\\\Program Files (x86)\\\\\" and FolderPath !startswith \"C:\\\\ProgramData\\\\\" and FolderPath !startswith \"/System/\" and FolderPath !startswith \"/Library/Apple/\""
+                  },
+                  {
+                    "streams": [
+                      "Microsoft-Table-AADNonInteractiveUserSignInLogs"
+                    ],
+                    "destinations": [
+                      "[variables('destinationName')]"
+                    ],
+                    "transformKql": "source | extend CAP = todynamic(ConditionalAccessPolicies) | extend CAPLen = array_length(CAP) | extend ConditionalAccessPolicies = tostring(iff(CAPLen > 0, pack_array(CAP[0], CAP[1], CAP[2], CAP[3]), todynamic('[]'))) | project-away CAPLen, CAP"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.OperationalInsights/workspaces",
+              "apiVersion": "2025-07-01",
+              "name": "[parameters('workspaceName')]",
+              "location": "[parameters('location')]",
+              "properties": "[union(parameters('workspaceProperties'), createObject('defaultDataCollectionRuleResourceId', resourceId('Microsoft.Insights/dataCollectionRules', variables('dcrName'))))]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Insights/dataCollectionRules', variables('dcrName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "dcrName": {
+              "type": "string",
+              "value": "[variables('dcrName')]"
+            },
+            "dcrId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Insights/dataCollectionRules', variables('dcrName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'securadar-customer-infrastructure')]"
+      ]
+    },
+    {
+      "copy": {
+        "name": "watchlists",
+        "count": "[length(variables('watchlistConfig').watchlists)]"
+      },
+      "condition": "[or(contains(variables('watchlistConfig').watchlists[copyIndex()].categories, 'shared'), contains(variables('watchlistConfig').watchlists[copyIndex()].categories, parameters('deploymentType')))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('securadar-watchlist-{0}', copyIndex())]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "workspaceName": {
+            "value": "[variables('workspaceName')]"
+          },
+          "definition": {
+            "value": "[variables('watchlistConfig').watchlists[copyIndex()]]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.48.1.52935",
+              "templateHash": "4449120920918136312"
+            }
+          },
+          "parameters": {
+            "workspaceName": {
+              "type": "string"
+            },
+            "definition": {
+              "type": "object"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.SecurityInsights/watchlists",
+              "apiVersion": "2024-03-01",
+              "scope": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]",
+              "name": "[parameters('definition').alias]",
+              "properties": {
+                "displayName": "[parameters('definition').displayName]",
+                "source": "Local file",
+                "provider": "Microsoft",
+                "description": "[parameters('definition').description]",
+                "itemsSearchKey": "[parameters('definition').itemsSearchKey]",
+                "watchlistAlias": "[parameters('definition').alias]"
+              }
+            },
+            {
+              "copy": {
+                "name": "watchlistItems",
+                "count": "[length(parameters('definition').items)]"
+              },
+              "type": "Microsoft.SecurityInsights/watchlists/watchlistItems",
+              "apiVersion": "2024-03-01",
+              "scope": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]",
+              "name": "[format('{0}/{1}', parameters('definition').alias, guid(parameters('definition').alias, string(copyIndex())))]",
+              "properties": {
+                "itemsKeyValue": "[parameters('definition').items[copyIndex()]]"
+              },
+              "dependsOn": [
+                "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')), 'Microsoft.SecurityInsights/watchlists', parameters('definition').alias)]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'securadar-customer-infrastructure')]"
+      ]
+    }
+  ],
+  "outputs": {
+    "resourceGroupName": {
+      "type": "string",
+      "value": "[resourceGroup().name]"
+    },
+    "workspaceName": {
+      "type": "string",
+      "value": "[variables('workspaceName')]"
+    },
+    "workspaceResourceId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('workspaceName'))]"
+    }
+  }
+}
